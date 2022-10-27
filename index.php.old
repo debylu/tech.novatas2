@@ -1,0 +1,176 @@
+<?php
+
+/**
+ * Importa configurações do aplicativo e funções de uso geral:
+ **/
+require('includes/config.php');
+
+/**
+ * Obtém o endereço da página a ser acessada, da URL:
+ * Referências:
+ *  • https://www.w3schools.com/PhP/func_string_strtolower.asp
+ **/
+$route = mb_strtolower(htmlentities(trim($_SERVER['QUERY_STRING'])));
+
+// Se não selecionou uma página, carrega a página inicial:
+if ($route == '') $route = 'home';
+
+// Caminho das páginas:
+$path = $_SERVER['DOCUMENT_ROOT'];
+
+// Monta partes da página que está sendo acessada:
+$page = array(
+    'php' => "pages/{$route}/index.php",
+    'css' => "pages/{$route}/index.css",
+    'js' => "pages/{$route}/index.js"
+);
+
+// Se a página não existe, prepara a página de erro 404:
+if (!file_exists($page['php'])) :
+    $page = array(
+        'php' => "pages/404/index.php",
+        'css' => "pages/404/index.css",
+        'js' => "pages/404/index.js"
+    );
+endif;
+
+// Carrega o PHP/HTML da página correta:
+require($page['php']);
+
+/**
+ * Carrega o CSS da página correta caso exista:
+ * Referências:
+ *  • https://www.w3schools.com/php/func_filesystem_file_exists.asp
+ **/
+if (file_exists($page['css']))
+    $page_css = "<link rel=\"stylesheet\" href=\"/{$page['css']}\">";
+
+// Carrega o JavaScript da página correta caso exista:
+if (file_exists($page['js']))
+    $page_js = "<script src=\"/{$page['js']}\"></script>";
+
+// Processa o título da página:
+
+
+// Inicia variável de saída com os links das redes sociais no rodapé:
+$social_nav = "<nav><h4>Redes sociais:</h4>";
+
+/**
+ * Loop que monta links para as redes sociais no rodapé:
+ * Referências:
+ *  • https://www.w3schools.com/php/php_looping_for.asp
+ **/
+for ($i = 0; $i < count($s); $i++) :
+    $social_nav .= <<<HTML
+
+<a href="{$s[$i]['link']}" target="_blank">
+    <i class="fa-brands {$s[$i]['icon']} fa-fw"></i>
+    <span>{$s[$i]['name']}</span>
+</a>
+
+HTML;
+endfor;
+
+// Finaliza a variável de saída da lista de redes sociais do rodapé:
+$social_nav .= '</nav>';
+
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <?php
+    // Carrega CSS de uma página específica:
+    echo $page_css;
+    ?>
+    <link rel="shortcut icon" href="<?php echo $c['favicon'] ?>">
+    <title><?php echo $c['sitename'] ?></title>
+</head>
+
+<body>
+    <a id="top"></a>
+    <div id="wrap">
+        <header>
+            <a href="/" title="Página inicial">
+                <img src="<?php echo $c['sitelogo'] ?>" alt="Logotipo de <?php echo $c['sitename'] ?>">
+            </a>
+            <h1>
+                <?php echo $c['sitename'] ?>
+                <span><?php echo $c['siteslogan'] ?></span>
+            </h1>
+        </header>
+        <nav>
+
+            <a href="/" title="Página inicial">
+                <i class="fa-fw fa-solid fa-house-chimney"></i>
+                <span>Início</span>
+            </a>
+            <a href="/?contacts">
+                <i class="fa-fw fa-solid fa-comment-dots"></i>
+                <span>Contatos</span>
+            </a>
+            <a href="/?about">
+                <i class="fa-fw fa-solid fa-circle-info"></i>
+                <span>Sobre</span>
+            </a>
+            <a href="/?profile">
+                <i class="fa-fw fa-solid fa-user"></i>
+                <span>Login</span>
+            </a>
+
+        </nav>
+
+        <main id="content"><?php echo $content ?></main>
+
+        <footer>
+
+            <div id="ftop">
+                <a href="/" title="Página inicial">
+                    <i class="fa-fw fa-solid fa-house-chimney"></i>
+                </a>
+                <div>&copy; 2022 <?php echo $c['sitename'] ?></div>
+                <a href="#top">
+                    <i class="fa-fw fa-solid fa-circle-up"></i>
+                </a>
+            </div>
+
+            <div id="fbottom">
+                <?php
+                // Exibe a lista de redes sociais já formatada para o rodapé.
+                echo $social_nav;
+                ?>
+                <nav>
+                    <h4>Links rápidos:</h4>
+                    <a href="/?contacts">
+                        <i class="fa-fw fa-solid fa-comment-dots"></i>
+                        <span>Contatos</span>
+                    </a>
+                    <a href="/?about">
+                        <i class="fa-fw fa-solid fa-circle-info"></i>
+                        <span>Sobre</span>
+                    </a>
+                    <a href="/?policies">
+                        <i class="fa-solid fa-user-lock fa-fw"></i>
+                        <span>Privacidade</span>
+                    </a>
+                </nav>
+            </div>
+        </footer>
+
+        <span>&nbsp;</span>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="/script.js"></script>
+    <?php
+    // Carrega JavaScript de uma página específica:
+    echo $page_js;
+    ?>
+
+</body>
+
+</html>
